@@ -1,0 +1,18 @@
+# Git
+.git
+.gitignore
+
+# Entorno virtual y caché de Python (no los necesitamos dentro del contenedor)
+venv/
+__pycache__/
+*.pyc
+
+# Archivo de variables de entorno (¡NUNCA debe estar en la imagen!)
+.env
+
+# Archivos de configuración de IDEs
+.idea/
+.vscode/
+
+# Directorio de trabajo del servidor (este se crea dentro del contenedor)
+workspaces/
