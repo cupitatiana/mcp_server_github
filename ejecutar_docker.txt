@@ -1,1 +1,1 @@
-docker run -d -p 8000:8000 --env-file .env -v ~/projects/mcp-server/workspaces:/app/workspaces --name mcp-server-container mcp-server:latest
+docker run -d -p 8000:8000 --env-file .env -v "$(pwd)/workspaces":/app/workspaces --name mcp-server-container mcp-server:latest
