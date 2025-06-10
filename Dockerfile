@@ -1,21 +1,20 @@
-# Usamos una imagen oficial y ligera de Python como base. Es nuestro "sistema operativo".
+# --- Etapa 1: Base ---
 FROM python:3.11-slim
 
-# Establecemos un directorio de trabajo dentro del contenedor para mantener todo ordenado.
+# --- Etapa 2: Configuración del Entorno ---
 WORKDIR /app
 
-# Copiamos SOLO el archivo de requisitos primero.
-# Esto es un truco de optimización: si no cambiamos las dependencias,
-# Docker reutilizará la capa ya instalada, haciendo las futuras construcciones mucho más rápidas.
-COPY requirements.txt .
+# --- NUEVO PASO: Instalar dependencias del sistema (como Git) ---
+# Primero actualizamos la lista de paquetes, luego instalamos git sin paquetes recomendados
+# para mantener la imagen pequeña, y finalmente limpiamos la caché.
+RUN apt-get update && apt-get install -y --no-install-recommends git && rm -rf /var/lib/apt/lists/*
 
-# Instalamos las dependencias de Python que definimos en requirements.txt.
+# --- Etapa 3: Instalar Dependencias de Python ---
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Ahora copiamos el resto del código de nuestra aplicación al contenedor.
+# --- Etapa 4: Copiar el Código de la Aplicación ---
 COPY . .
 
-# El comando que se ejecutará cuando el contenedor se inicie.
-# Le dice a Uvicorn que inicie nuestra app 'app' desde el archivo 'main.py'
-# y que escuche en todas las interfaces de red ('0.0.0.0') en el puerto 8000.
+# --- Etapa 5: Comando de Ejecución ---
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

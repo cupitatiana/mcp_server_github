@@ -137,21 +137,32 @@ def create_pull_request(request: PullRequestRequest):
     return {"message": "¡Pull Request creado exitosamente!", "pr_url": pr_data["html_url"]}
 
 
-# --- RE-AÑADIDO: El endpoint para crear y subir un proyecto completo ---
+# --- El endpoint modificado ---
 @app.post("/actions/upload_project_to_new_repo")
 def upload_project_to_new_repo(request: UploadProjectRequest):
     """
-    Toma un proyecto local, crea un repo en GitHub y sube el código.
+    Toma un proyecto que ya está en el directorio 'workspaces',
+    crea un repo en GitHub y sube el código.
     """
     if not GITHUB_TOKEN:
         raise HTTPException(status_code=500, detail="GITHUB_TOKEN no configurado.")
     
-    # Paso 1: Crear el repositorio remoto en GitHub vía API
+    # --- LÓGICA MEJORADA ---
+    # Ahora construimos la ruta completa DESDE DENTRO del punto de vista del servidor.
+    local_path = os.path.join(WORKSPACES_DIR, request.project_dir_name)
+    
+    if not os.path.isdir(local_path):
+        raise HTTPException(status_code=404, detail=f"El directorio del proyecto '{local_path}' no existe DENTRO del workspace del servidor.")
+
+    # El resto de la lógica para crear el repo y hacer el push se mantiene igual,
+    # ya que opera sobre la 'local_path' que hemos validado.
+    
     print(f"Creando repositorio '{request.repo_name}' en GitHub...")
     api_url = "https://api.github.com/user/repos"
     headers = {"Authorization": f"token {GITHUB_TOKEN}", "Accept": "application/vnd.github.v3+json"}
     data = {"name": request.repo_name, "private": request.is_private}
     response = requests.post(api_url, json=data, headers=headers)
+    
     if response.status_code not in [200, 201]:
         raise HTTPException(status_code=response.status_code, detail=f"Error al crear repo en GitHub: {response.text}")
     
@@ -160,11 +171,6 @@ def upload_project_to_new_repo(request: UploadProjectRequest):
     auth_clone_url = clone_url.replace("https://", f"https://{GITHUB_TOKEN}@")
     print(f"Repositorio creado exitosamente: {repo_data['html_url']}")
 
-    # Paso 2: Orquestar los comandos de Git en la carpeta local
-    local_path = request.local_project_path
-    if not os.path.isdir(local_path):
-        raise HTTPException(status_code=404, detail=f"El directorio local '{local_path}' no existe.")
-        
     run_command(["git", "init"], cwd=local_path)
     run_command(["git", "remote", "add", "origin", auth_clone_url], cwd=local_path)
     run_command(["git", "add", "."], cwd=local_path)

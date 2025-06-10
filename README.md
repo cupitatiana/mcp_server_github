@@ -26,7 +26,7 @@ Fue desarrollado como parte de una sesión de programación colaborativa con un 
 
 1.  **Clona este repositorio:**
     ```bash
-    git clone [https://github.com/cupitatiana/mcp-server.git](https://github.com/cupitatiana/mcp-server.git)
+    git clone [https://github.com/cupitatiana/mcp_server_github.git](https://github.com/cupitatiana/mcp_server_github.git)
     cd mcp-server
     ```
 
