@@ -38,9 +38,9 @@ class PullRequestRequest(BaseModel):
     head_branch: str
     base_branch: str = "main"
 
-# --- RE-AÑADIDO: El modelo de datos para subir un proyecto ---
+# --- El modelo de datos CORRECTO para subir un proyecto ---
 class UploadProjectRequest(BaseModel):
-    local_project_path: str
+    project_dir_name: str # <- ¡Este es el campo correcto!
     repo_name: str
     is_private: bool = True
 
