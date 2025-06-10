@@ -71,7 +71,7 @@ Este sistema está diseñado bajo un principio de **Separación de Responsabilid
 5.  **Ejecuta el contenedor:**
     Este comando iniciará el servidor de forma persistente y conectará tu carpeta `workspaces` local con la del contenedor.
     ```bash
-    docker run -d -p 8000:8000 --env-file .env --restart always -v "$(pwd)/workspaces":/app/workspaces --name mcp-server-container mcp-server:latest
+    docker run -d -p 8000:8000 --env-file .env -v "$(pwd)/workspaces":/app/workspaces --name mcp-server-container mcp-server:latest
     ```
 
 6.  **¡Verifica que funciona!**
